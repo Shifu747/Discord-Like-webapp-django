@@ -1,6 +1,7 @@
 from email import message
 from http.client import HTTPResponse
 from multiprocessing import context
+import re
 from django.shortcuts import render, redirect
 from django.db.models import Q
 from django.http import HttpResponse
@@ -45,22 +46,38 @@ def logoutUser(request):
     logout(request)
     return redirect('home')
 
+# def registerUser(request):
+#     page = 'register'
+#     form = UserCreationForm()
+
+#     if request.method == "POST":
+#         form = UserCreationForm(request.POST)
+#         if form.is_valid():
+#             user = form.save(commit=False)
+#             user.username = user.username.lower()
+#             user.save()
+#             login(request,user)
+#             return redirect('home')
+#         else:
+#             messages.error(request, 'An error Occured')
+
+#     return render(request, 'base/login_register.html',{'form':form})
+
 def registerUser(request):
-    page = 'register'
     form = UserCreationForm()
 
-    if request.method == "POST":
+    if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
             user.username = user.username.lower()
             user.save()
-            login(request,user)
+            login(request, user)
             return redirect('home')
         else:
-            messages.error(request, 'An error Occured')
+            messages.error(request, 'An error occurred during registration')
 
-    return render(request, 'base/login_register.html',{'form':form})
+    return render(request, 'base/login_register.html', {'form': form})
 
 #for home page
 def home(request):
@@ -71,7 +88,7 @@ def home(request):
                                 Q(description__icontains=q)
                                 )
     # rooms = Room.objects.all()
-    topics = Topic.objects.all()
+    topics = Topic.objects.all()[0:5]
     room_count = rooms.count()
     room_messages = Message.objects.filter(Q(room__topic__name__icontains=q))
 
@@ -220,3 +237,17 @@ def updateUser(request):
             form.save()
             return redirect('user-profile',id=request.user.id)
     return render(request, 'base/update-user.html',{'form': form})
+
+
+def topicsPage(request):
+    q = request.GET.get('q') if request.GET.get('q') != None else ''
+    topics = Topic.objects.filter(name__icontains=q)
+
+    return render(request, 'base/topics.html', {"topics" : topics})
+
+def activityPage(request):
+    q = request.GET.get('q') if request.GET.get('q') != None else ''
+    room_messages = Message.objects.all()
+    # filter(Q(room__topic__name__icontains=q))
+
+    return render (request, 'base/activity.html', {'room_messages':room_messages})
