@@ -1,0 +1,49 @@
+1. login_register.html
+        div 
+            form POST method action ""
+            csrf_token
+                label username
+                input type text name username placeholder Enter username
+                label password
+                input type password name password placeholder Enter password
+
+
+                input submit type login value
+
+2. views.py
+        create loginPage(request)
+3. urls.py
+    'login/'
+
+4. navbar.html
+        a tag with {% url 'login' %}
+
+5. loginPage
+    from django.contrib import messages
+        if request.method == POST:
+            username = request.POST.get('username')
+            sem password
+            import user
+            try:
+                user = User.objects.get(username=username)
+            except:
+                messages.error(request, "User Doesn't exist")
+
+            user = authenticate(request,username=username, password=password)
+
+            if user is not None:
+                login(request,user)
+                return redirect('home')
+            else:
+                messages.error(request, 'username or password doesnot match')
+
+6. main.html under exNavbar add if messages template
+
+7. inside navbar
+        {% if request.user.is_authenticated %}
+        a href Logout
+        else
+        Login
+
+8. logoutPage
+        Logout(request) and add to urls

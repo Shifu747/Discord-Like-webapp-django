@@ -1,0 +1,41 @@
+1. inside home.html
+    add a div class = 'home-container'
+        add two div one side bar other in another div
+            add sytle tag top of the file
+                .home-container{
+                    display: grid;
+                    grid-template-columns: 1fr 3fr;
+                }
+
+2. inside views.py
+        topics = Topic.objects.all()
+        add new item to contex = { 'topics' : topics}
+
+3. inside home.html
+        iterate through topic in topics 
+            add a "a" tag with {% url 'home' %}?q={{topic.name}}
+
+4. views.py
+        q = request.GET.get('q') ...
+        ...if request.GET.get('q') != None else ''
+
+        rooms = Room.objects.filter(topic__name__icontains=q)
+
+
+4. navbar form 
+        create form method GET action url home 
+            input type text name q placeholder search rooms
+        
+5. dynamic values inside views:
+        djnago.db.models import Q 
+
+        rooms = Room.objects.filter(
+            Q(topic__name__icontains=q) |
+            Q(name__icontains =q) |
+            Q(descriptions__icontains=q)
+            ) 
+
+        room_count = rooms.count(); add it to context
+
+6. inside home beforee create rooms
+        add h5 {{room_count}} rooms available
