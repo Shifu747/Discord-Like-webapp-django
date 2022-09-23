@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect
 from django.db.models import Q
 from django.http import HttpResponse
 from .models import Message, Room, Topic, User
-from .forms import RoomForm, UserForm
+from .forms import RoomForm, UserForm, MyUserCreationForm
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -20,7 +20,9 @@ def loginPage(request):
     if request.user.is_authenticated:
         return redirect("home")
     if request.method == 'POST':
-        username = request.POST.get('username').lower()
+
+        username = request.POST.get('username')
+        print(username)#.lower()
         password = request.POST.get('password')
 
         try:
@@ -64,10 +66,10 @@ def logoutUser(request):
 #     return render(request, 'base/login_register.html',{'form':form})
 
 def registerUser(request):
-    form = UserCreationForm()
+    form = MyUserCreationForm()
 
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = MyUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
             user.username = user.username.lower()
@@ -232,7 +234,7 @@ def updateUser(request):
     form = UserForm(instance=request.user)
 
     if request.method == 'POST':
-        form = UserForm(request.POST, instance=request.user)
+        form = UserForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
             form.save()
             return redirect('user-profile',id=request.user.id)
